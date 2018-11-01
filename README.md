@@ -39,7 +39,7 @@ Definition of states (e.g. $N=3$):
 ```
 git clone https://github.com/RobertTLange/gym-hanoi
 cd gym_hanoi
-python setup.py install
+pip install -e .
 ```
 
 * Import the package and create an environment (default number of disks is 4 and transitions are deterministic).
