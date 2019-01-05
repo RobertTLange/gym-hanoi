@@ -137,7 +137,6 @@ class HanoiEnv(gym.Env):
                     valid = False
 
                 if not valid:
-                    print(state, action)
                     mov_map[state][action] = -np.inf
 
         return mov_map
