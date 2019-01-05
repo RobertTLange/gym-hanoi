@@ -3,7 +3,8 @@ from gym import error, spaces, utils
 from gym.utils import seeding
 
 import random
-
+import itertools
+import numpy as np
 
 class HanoiEnv(gym.Env):
     metadata = {'render.modes': ['human']}
@@ -53,7 +54,6 @@ class HanoiEnv(gym.Env):
                 info["transition_failure"] = True
 
         move = action_to_move[action]
-
 
         if self.move_allowed(move):
             disk_to_move = min(self.disks_on_peg(move[0]))
@@ -115,6 +115,32 @@ class HanoiEnv(gym.Env):
         print("Hanoi Environment Parameters have been set to:")
         print("\t Number of Disks: {}".format(self.num_disks))
         print("\t Transition Failure Probability: {}".format(self.env_noise))
+
+    def get_movability_map(self):
+        # Initialize movability map
+        mov_map = np.zeros(self.num_disks*(3, ) + (6,))
+
+        # Get list of all states as tuples
+        id_list = self.num_disks*[0] + self.num_disks*[1] + self.num_disks*[2]
+        states = list(itertools.permutations(id_list, self.num_disks))
+
+        for state in states:
+            for action in range(6):
+                move = action_to_move[action]
+
+                disks_from = [d for d in range(self.num_disks) if state[d] == move[0]]
+                disks_to = [d for d in range(self.num_disks) if state[d] == move[1]]
+
+                if disks_from:
+                    valid = (min(disks_to) > min(disks_from)) if disks_to else True
+                else:
+                    valid = False
+
+                if not valid:
+                    print(state, action)
+                    mov_map[state][action] = -np.inf
+
+        return mov_map
 
 
 action_to_move = {0: (0, 1), 1: (0, 2), 2: (1, 0),
