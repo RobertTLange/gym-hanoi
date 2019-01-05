@@ -65,6 +65,7 @@ class HanoiEnv(gym.Env):
 
         if self.current_state == self.goal_state:
             reward = 100
+            self.done = True
         else:
             reward = 0
 
