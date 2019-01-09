@@ -108,14 +108,16 @@ class HanoiEnv(gym.Env):
     def render(self, mode='human', close=False):
         return
 
-    def set_env_parameters(self, num_disks=4, env_noise=0):
+    def set_env_parameters(self, num_disks=4, env_noise=0, verbose=True):
         self.num_disks = num_disks
         self.env_noise = env_noise
         self.observation_space = spaces.Tuple(self.num_disks*(spaces.Discrete(3),))
         self.goal_state = self.num_disks*(2,)
-        print("Hanoi Environment Parameters have been set to:")
-        print("\t Number of Disks: {}".format(self.num_disks))
-        print("\t Transition Failure Probability: {}".format(self.env_noise))
+
+        if verbose:
+            print("Hanoi Environment Parameters have been set to:")
+            print("\t Number of Disks: {}".format(self.num_disks))
+            print("\t Transition Failure Probability: {}".format(self.env_noise))
 
     def get_movability_map(self):
         # Initialize movability map
