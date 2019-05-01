@@ -130,20 +130,42 @@ class HanoiEnv(gym.Env):
         for state in states:
             for action in range(6):
                 move = action_to_move[action]
+                disks_from = []
+                disks_to = []
+                for d in range(self.num_disks):
+                    if state[d] == move[0]: disks_from.append(d)
+                    elif state[d] == move[1]: disks_to.append(d)
 
-                disks_from = [d for d in range(self.num_disks) if state[d] == move[0]]
-                disks_to = [d for d in range(self.num_disks) if state[d] == move[1]]
+                if disks_from: valid = (min(disks_to) > min(disks_from)) if disks_to else True
+                else: valid = False
 
-                if disks_from:
-                    valid = (min(disks_to) > min(disks_from)) if disks_to else True
-                else:
-                    valid = False
+                if not valid: mov_map[state][action] = -np.inf
 
-                if not valid:
-                    mov_map[state][action] = -np.inf
+                move_from = [m[0] for m in action_to_move]
+                move_to = [m[1] for m in action_to_move]
 
+        # # Try to get rid of action loop - vectorize...
+        # for state in states:
+        #     s = np.array(state)
+        #     disks_from = []
+        #     disks_to = []
+        #
+        #     for d in range(self.num_disks):
+        #         a_from = [a for a, v in enumerate(move_from) if v == s[d]]
+        #         a_to = [a for a, v in enumerate(move_to) if v == s[d]]
+        #
+        #         if disks_from:
+        #             valid = (min(disks_to) > min(disks_from)) if disks_to else True
+        #         else:
+        #             valid = False
+        #
+        #         if not valid:
+        #             mov_map[state][action] = -np.inf
         return mov_map
 
 
-action_to_move = {0: (0, 1), 1: (0, 2), 2: (1, 0),
-                  3: (1, 2), 4: (2, 0), 5: (2, 1)}
+action_to_move = [(0, 1), (0, 2), (1, 0),
+                  (1, 2), (2, 0), (2, 1)]
+
+# action_to_move = {0: (0, 1), 1: (0, 2), 2: (1, 0),
+#                   3: (1, 2), 4: (2, 0), 5: (2, 1)}
