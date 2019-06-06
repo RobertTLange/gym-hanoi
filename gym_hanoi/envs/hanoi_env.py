@@ -6,6 +6,7 @@ import random
 import itertools
 import numpy as np
 
+
 class HanoiEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
@@ -66,6 +67,8 @@ class HanoiEnv(gym.Env):
         if self.current_state == self.goal_state:
             reward = 100
             self.done = True
+        elif info["invalid_action"] == True:
+            reward = -1
         else:
             reward = 0
 
@@ -119,30 +122,31 @@ class HanoiEnv(gym.Env):
             print("\t Number of Disks: {}".format(self.num_disks))
             print("\t Transition Failure Probability: {}".format(self.env_noise))
 
-    def get_movability_map(self):
+    def get_movability_map(self, fill=False):
         # Initialize movability map
         mov_map = np.zeros(self.num_disks*(3, ) + (6,))
 
-        # Get list of all states as tuples
-        id_list = self.num_disks*[0] + self.num_disks*[1] + self.num_disks*[2]
-        states = list(itertools.permutations(id_list, self.num_disks))
+        if fill:
+            # Get list of all states as tuples
+            id_list = self.num_disks*[0] + self.num_disks*[1] + self.num_disks*[2]
+            states = list(itertools.permutations(id_list, self.num_disks))
 
-        for state in states:
-            for action in range(6):
-                move = action_to_move[action]
-                disks_from = []
-                disks_to = []
-                for d in range(self.num_disks):
-                    if state[d] == move[0]: disks_from.append(d)
-                    elif state[d] == move[1]: disks_to.append(d)
+            for state in states:
+                for action in range(6):
+                    move = action_to_move[action]
+                    disks_from = []
+                    disks_to = []
+                    for d in range(self.num_disks):
+                        if state[d] == move[0]: disks_from.append(d)
+                        elif state[d] == move[1]: disks_to.append(d)
 
-                if disks_from: valid = (min(disks_to) > min(disks_from)) if disks_to else True
-                else: valid = False
+                    if disks_from: valid = (min(disks_to) > min(disks_from)) if disks_to else True
+                    else: valid = False
 
-                if not valid: mov_map[state][action] = -np.inf
+                    if not valid: mov_map[state][action] = -np.inf
 
-                move_from = [m[0] for m in action_to_move]
-                move_to = [m[1] for m in action_to_move]
+                    move_from = [m[0] for m in action_to_move]
+                    move_to = [m[1] for m in action_to_move]
 
         # # Try to get rid of action loop - vectorize...
         # for state in states:
